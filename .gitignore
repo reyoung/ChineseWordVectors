@@ -1,3 +1,9 @@
+# Paddle
+word_dict
+*.pkl
+.idea
+preprocessed
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
