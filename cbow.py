@@ -15,21 +15,17 @@ def cbow_main(cost_config, window_size=5, prefix="./output/cbow_softmax/",
     assert word_dict_limit < MAX_WORDS
     assert window_size % 2 == 1
     paddle.init(use_gpu=False, trainer_count=cpu_num)
-    word_left = []
-    word_right = []
+    words = []
 
     word_limit = word_dict_limit + 2
 
-    for i in xrange(window_size / 2):
-        word_left.append(paddle.layer.data(name='word_left_%d' % i,
-                                           type=paddle.data_type.integer_value(
-                                               word_limit)))
-        word_right.append(paddle.layer.data(name='word_right_%d' % i,
-                                            type=paddle.data_type.integer_value(
-                                                word_limit)))
+    for i in xrange(window_size):
+        words.append(paddle.layer.data(name='word_%d' % i,
+                                       type=paddle.data_type.integer_value(
+                                           word_limit)))
 
     embs = []
-    for w in word_left + word_right:
+    for w in words[:window_size / 2] + words[-window_size / 2 + 1:]:
         embs.append(
             paddle.layer.embedding(input=w, size=emb_size, param_attr=
             paddle.attr.Param(name='emb', sparse_update=True)))
@@ -38,8 +34,7 @@ def cbow_main(cost_config, window_size=5, prefix="./output/cbow_softmax/",
         for emb in embs:
             sum_emb += paddle.layer.identity_projection(input=emb)
 
-    label = paddle.layer.data(name='mid_word',
-                              type=paddle.data_type.integer_value(word_limit))
+    label = words[window_size/2]
 
     cost = cost_config(sum_emb, label, word_limit)
 
@@ -81,7 +76,8 @@ def cbow_main(cost_config, window_size=5, prefix="./output/cbow_softmax/",
                                path="./preprocessed"), 16 * cpu_num * 4000),
             96 * cpu_num),
         num_passes=50,
-        event_handler=event_handler)
+        event_handler=event_handler,
+        feeding=[w.name for w in words])
 
 
 def softmax_cost(sum_emb, label, word_limit):
@@ -110,7 +106,7 @@ def nce_cost(sum_emb, label, word_limit):
         word_count.append(s / (word_limit - 2))
         s += word_count[-1] * 2
     assert len(word_count) == word_limit
-    word_count = [float(x)/s for x in word_count]
+    word_count = [float(x) / s for x in word_count]
     return paddle.layer.nce(input=sum_emb, label=label, num_classes=word_limit,
                             neg_distribution=word_count)
 
