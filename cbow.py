@@ -34,7 +34,7 @@ def cbow_main(cost_config, window_size=5, prefix="./output/cbow_softmax/",
         for emb in embs:
             sum_emb += paddle.layer.identity_projection(input=emb)
 
-    label = words[window_size/2]
+    label = words[window_size / 2]
 
     cost = cost_config(sum_emb, label, word_limit)
 
@@ -64,8 +64,9 @@ def cbow_main(cost_config, window_size=5, prefix="./output/cbow_softmax/",
 
         if isinstance(event, paddle.event.EndPass):
             print "Pass %d" % event.pass_id
-            with gzip.open(os.path.join(prefix, "model_%d_%d.tar.gz" %
-                    event.pass_id, 'w')) as f:
+            with gzip.open(
+                    os.path.join(prefix, "model_%d.tar.gz" % event.pass_id,
+                                 'w')) as f:
                 parameters.to_tar(f)
 
     trainer.train(
@@ -75,7 +76,7 @@ def cbow_main(cost_config, window_size=5, prefix="./output/cbow_softmax/",
                                word_limit=word_dict_limit,
                                path="./preprocessed"), 16 * cpu_num * 4000),
             96 * cpu_num),
-        num_passes=50,
+        num_passes=1,
         event_handler=event_handler,
         feeding=[w.name for w in words])
 
