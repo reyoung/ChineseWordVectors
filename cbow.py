@@ -2,10 +2,10 @@ import pyximport; pyximport.install()
 import gzip
 import os
 import sys
-import math
-from utils.data_reader import reader_creator
 
 import paddle.v2 as paddle
+
+from utils.data_reader import reader_creator
 
 MAX_WORDS = 1705935
 
@@ -37,7 +37,7 @@ def cbow_main(cost_config, window_size=5, prefix="./output/cbow_softmax/",
         for emb in embs:
             sum_emb += paddle.layer.identity_projection(input=emb)
 
-    label = words[window_size/2]
+    label = words[window_size / 2]
 
     cost = cost_config(sum_emb, label, word_limit)
 
