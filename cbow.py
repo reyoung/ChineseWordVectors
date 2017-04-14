@@ -1,10 +1,10 @@
 import gzip
 import os
 import sys
-import math
-from utils.data_reader import reader_creator
 
 import paddle.v2 as paddle
+
+from utils.data_reader import reader_creator
 
 MAX_WORDS = 1705935
 
@@ -76,7 +76,7 @@ def cbow_main(cost_config, window_size=5, prefix="./output/cbow_softmax/",
                                word_limit=word_dict_limit,
                                path="./preprocessed"), 16 * cpu_num * 4000),
             96 * cpu_num),
-        num_passes=1,
+        num_passes=2,
         event_handler=event_handler,
         feeding=[w.name for w in words])
 
@@ -113,4 +113,4 @@ def nce_cost(sum_emb, label, word_limit):
 
 
 if __name__ == '__main__':
-    cbow_main(nce_cost, window_size=11)
+    cbow_main(hsigmoid_cost, window_size=11, cpu_num=4)
