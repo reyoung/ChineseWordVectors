@@ -1,3 +1,6 @@
 [submodule "data"]
 	path = data
 	url = https://github.com/reyoung/chinese_wiki_data_preprocessed.git
+[submodule "weibo_data"]
+	path = weibo_data
+	url = https://github.com/reyoung/weibo_qa_dataset.git

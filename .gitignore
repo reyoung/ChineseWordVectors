@@ -1,8 +1,8 @@
 # Paddle
-word_dict
+word_dict_*
 *.pkl
 .idea
-preprocessed
+preprocessed_*
 *.tar.gz
 
 # Byte-compiled / optimized / DLL files

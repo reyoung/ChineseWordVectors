@@ -1,5 +1,6 @@
 import cPickle
 import sys
+
 wd = dict()
 idx = 0
 for line in sys.stdin:

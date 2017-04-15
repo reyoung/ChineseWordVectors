@@ -1,5 +1,7 @@
 import collections
 import sys
+import regex as re
+pattern = re.compile(r'([\p{IsHan}]+)', re.UNICODE)
 
 word_dict = collections.defaultdict(int)
 for line in sys.stdin:
@@ -16,4 +18,5 @@ for i, key in enumerate(word_dict):
 word_list.sort(key=lambda x: x[1], reverse=True)
 
 for w, cnt in word_list:
+    if pattern.match(w) is None: continue
     print cnt, w.encode('utf-8')
