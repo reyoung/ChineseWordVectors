@@ -1,3 +1,4 @@
+import pyximport; pyximport.install()
 import gzip
 import os
 import sys
@@ -12,7 +13,9 @@ MAX_WORDS = 1705935
 def cbow_main(cost_config, window_size=5, prefix="./output/cbow_softmax/",
               cpu_num=3,
               word_dict_limit=20000, emb_size=32,
-              data_prefix='./preprocessed_wiki'):
+              data_prefix='./preprocessed_wiki',
+              num_passes=2,
+              batch_size_per_cpu=2000):
     assert word_dict_limit < MAX_WORDS
     assert window_size % 2 == 1
     paddle.init(use_gpu=False, trainer_count=cpu_num)
@@ -65,9 +68,8 @@ def cbow_main(cost_config, window_size=5, prefix="./output/cbow_softmax/",
 
         if isinstance(event, paddle.event.EndPass):
             print "Pass %d" % event.pass_id
-            with gzip.open(
-                    os.path.join(prefix, "model_%d.tar.gz" % event.pass_id,
-                                 'w')) as f:
+            with gzip.open(os.path.join(prefix, "model_%d.tar.gz" %
+                    event.pass_id), 'w') as f:
                 parameters.to_tar(f)
 
     trainer.train(
@@ -76,8 +78,8 @@ def cbow_main(cost_config, window_size=5, prefix="./output/cbow_softmax/",
                 reader_creator(window_size=window_size,
                                word_limit=word_dict_limit,
                                path=data_prefix), 16 * cpu_num * 4000),
-            96 * cpu_num),
-        num_passes=2,
+            batch_size_per_cpu*cpu_num),
+        num_passes=num_passes,
         event_handler=event_handler,
         feeding=[w.name for w in words])
 
@@ -114,4 +116,4 @@ def nce_cost(sum_emb, label, word_limit):
 
 
 if __name__ == '__main__':
-    cbow_main(hsigmoid_cost, window_size=11, cpu_num=2, data_prefix="./preprocessed_weibo")
+    cbow_main(hsigmoid_cost, window_size=11, cpu_num=2, num_passes=1,  data_prefix="./preprocessed_weibo")
