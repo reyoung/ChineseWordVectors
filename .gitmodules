@@ -1,0 +1,3 @@
+[submodule "wiki_data"]
+	path = wiki_data
+	url = https://github.com/reyoung/chinese_wiki_data_preprocessed.git
