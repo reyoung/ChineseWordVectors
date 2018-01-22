@@ -6,7 +6,8 @@ for line in sys.stdin:
     line = line.decode('utf-8')
     line = line.strip()
     for w in line.split():
-        word_dict[w] += 1
+        for elem in w:
+            word_dict[elem] += 1
 
 word_list = [None] * len(word_dict)
 

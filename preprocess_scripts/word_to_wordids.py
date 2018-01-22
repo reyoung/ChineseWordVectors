@@ -13,7 +13,7 @@ def mapping_words():
     with open(IN_FILE, 'r') as fin:
         for line in fin:
             line = line.decode('utf-8')
-            yield [word_dict[w] for w in line.strip().split()]
+            yield [word_dict[elem] for w in line.strip().split() for elem in w]
 
 
 cPickle.dump(list(mapping_words()), open(OUT_FILE, 'wb'), -1)

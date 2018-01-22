@@ -1,3 +1,4 @@
+model_*
 # Paddle
 word_dict
 *.pkl
